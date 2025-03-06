@@ -17,4 +17,9 @@ class VerifyCsrfToken
     {
         return $next($request);
     }
+
+    protected $except = [
+        'api/posts/comments', // Excluir esta ruta de la verificación CSRF
+    ];
+
 }

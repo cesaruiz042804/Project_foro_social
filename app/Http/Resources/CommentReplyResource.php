@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class CommentReplyResource extends JsonResource
 {
@@ -16,10 +17,11 @@ class CommentReplyResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'comment_id' => $this->comment->id,
             'name' => $this->user->name . ' ' . $this->user->lastname,
             'userReply' => $this->user->username,
             'reply' => $this->reply,
-            'date' => $this->created_at->format('F j, Y, g:i A'),
+            'date' => Carbon::parse($this->created_at)->setTimezone('America/Panama')->format('F j, Y, g:i A'),
         ];
     }
 }

@@ -3,79 +3,56 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
-use App\Http\Requests\StorePostsRequest;
-use App\Http\Requests\UpdatePostsRequest;
 use App\Http\Resources\PostResource;
+use App\Services\LikeService; 
 use App\Models\Post;
-use App\Transformers\User\PostsResource;
-use App\Transformers\User\PostsResourceCollection;
-use App\Services\ResponseService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response;
 
 class PostsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $likeService;
 
-    private $posts;
-
-    public function __construct()
+    public function __construct(LikeService $likeService) // Constructor
     {
-        //$this->posts = $posts;
+        $this->likeService = $likeService; // Inicializa LikeService
     }
 
-    public function posts()
+    public function posts($user_id): JsonResponse
     {
-        //$data = Post::take(12)->get();
-        //$data = $post->client;
-        //return response()->json(['message' => 'Hello']);
-        $data = Post::with(['client', 'likes', 'comments'])->get();
-        return PostResource::collection($data);
-        //return response()->json($data);
+        $data = Post::with(['client', 'likes', 'comments'])->get(); // Muestra los posts
+        $dataLike = $this->likeService->getLikes($user_id); // Muestra los likes
+
+        return response()->json([ // Retorna los posts y los likes
+            'posts' => PostResource::collection($data),
+            'liked_posts' => $dataLike,
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorePostsRequest $request) {}
-
-    /**
-     * Display the specified resource.
-     */
     public function show()
     {
-        /*
-        try {
-            $posts = $this->posts;
-            $data = Posts::all();
-            } catch (\Throwable | \Exception $e) {
-                return ResponseService::exception('users.store.posts', null, $e);
-                }
-                */
-        //$data = Client::all();
-        $data = Client::orderBy('name', 'asc')->take(12)->get();
+        $data = Client::orderBy('name', 'asc')->take(12)->get(); // Muestra los usuarios
         return response()->json($data);
-        //return response()->json(['message' => 'Hello']);
     }
 
     public function showComment(Post $id)
     {
-        return new PostResource($id);
-        //$comment = Post::with(['comments.user', 'comments.replies'])->find($id);
-        //return response()->json($comment);
-        // Seguridad
-        // Ver si esta logueado
-        // Ver si se envia en realidad un id
-
+        return new PostResource($id); // Retorna el post
     }
+
+
+    public function postsPaginacion($user_id): JsonResponse
+    {
+        $data = Post::with(['client', 'likes', 'comments'])->paginate(10);
+        $dataLike = $this->likeService->getLikes($user_id);
+
+        return response()->json([
+            'posts' => PostResource::collection($data),
+            'liked_posts' => $dataLike,
+        ]);
+    }
+
+
 
     public function edit()
     {

@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Client extends Model
+class Client extends Model implements JWTSubject
 {
-    use HasFactory; // <-- And this line is within your class
-    
+    use HasFactory, Notifiable, HasApiTokens; // <-- And this line is within your class
+
     protected $table = 'clients';
 
     protected $fillable = [ // <-- Definir los campos fillable
@@ -17,8 +20,6 @@ class Client extends Model
         'lastname',      // Apellido
         'email',         // Email
         'password',      // Contraseña (al registrar o actualizar, NO al recuperar)
-        // 'email_verified_at', //  No suele ser fillable, se maneja diferente
-        // 'remember_token',   //  Tampoco fillable, Laravel lo gestiona
     ];
 
     /**
@@ -59,5 +60,20 @@ class Client extends Model
     public function commentReplies()
     {
         return $this->hasMany(CommentReplie::class);
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey(); // Usualmente es el ID del usuario.
+    }
+
+    /**
+     * Obtiene los reclamos personalizados del JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return []; // Aquí puedes agregar cualquier dato extra que quieras incluir en el JWT.
     }
 }
