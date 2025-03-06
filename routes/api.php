@@ -13,13 +13,13 @@ Route::post('/register/create', [AuthController::class, 'create_register'])->mid
 Route::get('/register/complete/data/information', [AuthController::class, 'sendCompleteDataEmail']); // Esto es para enviar el correo
 Route::post('/verify-email/{token}', [AuthController::class, 'verifyEmail'])->middleware('throttle:5,1');
 Route::get('/users' , [PostsController::class, 'show']); // Esto muestra los usuarios
-Route::get('/posting/{id}', [PostsController::class, 'postsPaginacion']); // Esto muestra los posts de los usuarios
-Route::get('/post/{id}', [PostsController::class, 'showComment']); // Esto muestra los comentarios del post
-Route::get('/posts/{postId}/latest-comment', [CommentController::class, 'showLastCommentModal']); // Esto muestra el último comentario
-Route::post('/posts/comments', [CommentController::class, 'create']); // Esto crea un comentario
-Route::post('/posts/reply', [CommentReplyController::class, 'create']); // Esto crea una respuesta a un comentario
-Route::post('/post/{postId}/{userId}/like', [LikeController::class, 'likePost']); // Esto da like a un post
-Route::delete('/post/{postId}/{userId}/like', [LikeController::class, 'unlikePost']); // Esto quita el like a un post
+Route::middleware(['auth:sanctum'])->get('/posting/{id}', [PostsController::class, 'postsPaginacion']); // Esto muestra los posts de los usuarios
+Route::middleware(['auth:sanctum'])->get('/post/{id}', [PostsController::class, 'showComment']); // Esto muestra los comentarios del post
+Route::middleware(['auth:sanctum'])->get('/posts/{postId}/latest-comment', [CommentController::class, 'showLastCommentModal']); // Esto muestra el último comentario
+Route::middleware(['auth:sanctum'])->post('/posts/comments', [CommentController::class, 'create']); // Esto crea un comentario
+Route::middleware(['auth:sanctum'])->post('/posts/reply', [CommentReplyController::class, 'create']); // Esto crea una respuesta a un comentario
+Route::middleware(['auth:sanctum'])->post('/post/{postId}/{userId}/like', [LikeController::class, 'likePost']); // Esto da like a un post
+Route::middleware(['auth:sanctum'])->delete('/post/{postId}/{userId}/like', [LikeController::class, 'unlikePost']); // Esto quita el like a un post
 
 Route::options('{any}', function (Request $request) {
     // Orígenes permitidos
