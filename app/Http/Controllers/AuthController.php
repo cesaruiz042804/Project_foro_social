@@ -8,14 +8,13 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Client;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\RegisterSaveInformationRequest;
 use App\Mail\CompleteDataMail;
 use App\Models\BlacklistToken;
-
-
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
@@ -24,11 +23,11 @@ class AuthController extends Controller
     public function login(Request $request) // Para loguearse
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+            'username' => 'required|string|max:100',
+            'password' => 'required|string|max:100',
         ]);
 
-        $user = Client::where('email', $request->email)->first();
+        $user = Client::where('username', $request->username)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response([
