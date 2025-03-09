@@ -13,6 +13,7 @@ class Post extends Model
     protected $fillable = [ // <-- Definir los campos fillable
         'user_id', // Clave foránea (¡importante para asignación masiva al crear posts relacionados a usuarios!)
         'content', // Contenido del post
+        'url', // Contenido del post
     ];
 
     public function client()
