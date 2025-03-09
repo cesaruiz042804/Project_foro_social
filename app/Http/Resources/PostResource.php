@@ -20,6 +20,7 @@ class PostResource extends JsonResource
             'autor' => $this->client->name .  ' ' . $this->client->lastname, // Incluir el 'content' del post, cambiando el nombre a 'contenido' en el JSON
             'username' => $this->client->username,
             'content' => $this->content, // Incluir el 'content' del post, cambiando el nombre a 'contenido' en el JSON
+            'url' => $this->url, // Incluir la url del post
             'date' => Carbon::parse($this->created_at)->setTimezone('America/Panama')->format('F j, Y, g:i A'),
             'count_likes' => $this->likes->count(),
             'count_comment' => $this->comments->count(),
