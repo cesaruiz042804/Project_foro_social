@@ -66,42 +66,37 @@ class AuthController extends Controller
         }
     }
 
-    public function sendCompleteDataEmail(RegisterSaveInformationRequest $request)
-    {
-        //
-    }
-
     public function verifyEmail(RegisterSaveInformationRequest $request, $token)
     {
         // Primero, validamos los datos de la solicitud
-        $validatedData = $request->validated();
+        $validatedData = $request->validated(); // Validar los datos de la solicitud
 
         try {
             // Obtener el token desde la URL
             Log::info($token);
-            $blacklisted = BlacklistToken::where('token', $token)->exists();
+            $blacklisted = BlacklistToken::where('token', $token)->exists(); // Verificar si el token está en la lista negra
             if (!$token) {
-                return response()->json(['error' => 'El token es requerido'], 400);
+                return response()->json(['error' => 'El token es requerido'], 400); // 400 Bad Request
             } else if ($blacklisted) {
-                return response()->json(['error' => 'Token inválido'], 401);
+                return response()->json(['error' => 'Token inválido'], 401); // 401 Unauthorized
             }
 
             // Decodificar el token
-            $decoded = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
+            $decoded = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256')); // Decodificar el token
             // Obtener el ID del usuario desde el token (campo 'sub')
             $userId = $decoded->sub;
             Log::info('ID: ' . $userId);
             if ($userId) {
-                $user = Client::where('id', $userId)->first();
+                $user = Client::where('id', $userId)->first(); //
                 if ($user) {
                     Log::info('Usuario encontrado: ' . json_encode($user));
-                    $user->username = $request->username;
-                    $user->name = $request->name;
-                    $user->lastname = $request->lastname;
-                    $user->description = $request->description;
-                    $user->save();
-                    $black_list = BlacklistToken::create(['token' => $token]);
-                    Log::info("message: " . $black_list);
+                    $user->username = $request->username; // Actualizar los datos del usuario
+                    $user->name = $request->name; // Actualizar los datos del usuario
+                    $user->lastname = $request->lastname; // Actualizar los datos del usuario
+                    $user->description = $request->description; // Actualizar los datos del usuario
+                    $user->save(); // Guardar los datos del usuario
+                    $black_list = BlacklistToken::create(['token' => $token]); // Agregar el token a la lista negra
+                    Log::info("message: " . $black_list); // Loggear el mensaje
                 } else {
                     return response()->json(['error' => 'El usuario no existe'], 400);
                 }
@@ -109,11 +104,11 @@ class AuthController extends Controller
                 return response()->json(['error' => 'El token no es válido o no coincide con el ID'], 400);
             }
 
-
             return response()->json([
                 'message' => 'Token válido, los datos han sido guardados correctamente',
                 'user' => $user
             ]);
+            
         } catch (\Firebase\JWT\ExpiredException $e) {
             Log::error('Token expirado: ' . $e->getMessage());
             Log::info('Token expirado: ' . $e->getMessage());
@@ -125,5 +120,10 @@ class AuthController extends Controller
             Log::error('Error general en verifyEmail: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error con el token o los datos ' . $e->getMessage()], 500);
         }
+    }
+
+    public function sendCompleteDataEmail(RegisterSaveInformationRequest $request)
+    {
+        //
     }
 }
